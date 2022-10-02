@@ -20,17 +20,22 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import android.os.Handler;
+import android.widget.Toast;
 
-public class LectorTarjeta extends AppCompatActivity {
+import com.an.biometric.BiometricCallback;
+import com.an.biometric.BiometricManager;
+
+public class LectorTarjeta extends AppCompatActivity implements BiometricCallback {
 
 
     int REQUEST_ENABLE_BT;
     float Transparencia = 0.75F;
     static final UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    int sonido;
+    int auth=0;
     BluetoothSocket btSocket = null;
 
     SoundPool sp;
@@ -44,6 +49,8 @@ public class LectorTarjeta extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lector_tarjeta);
+
+
 
         //INICIALIZA VISUALES
         CuadroVerde = (ImageView) findViewById(R.id.ivVerdeAprobado);
@@ -90,35 +97,46 @@ public class LectorTarjeta extends AppCompatActivity {
 
     //==============METODOS==============//
 
-    public void Tarjeta(View view){
+    public void Tarjeta(View view) {
 
+        byte b = 0;
+        int B=0;
         try { //Recibir datos
 
             InputStream inputStream = btSocket.getInputStream();
             inputStream.skip(inputStream.available()); //INSTANCIA COSAS
 
-            byte b = (byte) inputStream.read(); //LEE Y GUARDA EN VARIABLE
+            b = (byte) inputStream.read();
             System.out.println("(char) b"); //IMPRIME
             System.out.println((char) b); //IMPRIME
-
+            B=b;
+            System.out.println("(INT 1 b"); //IMPRIME
+            System.out.println(B); //IMPRIME
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //CERRAR CONEXION
-        try {
-            btSocket.close();
-            System.out.println(btSocket.isConnected());
-        } catch (IOException e) {
-            e.printStackTrace();
+        System.out.println("(INT 2 b"); //IMPRIME
+        System.out.println(B); //IMPRIME
+        if (B == 49) {
+            huella();
         }
 
     }
 
 
+
     public void huella(){
+
         System.out.println("todo correcto");
+
+        new BiometricManager.BiometricBuilder(LectorTarjeta.this)
+                .setTitle("Add a title")
+                .setSubtitle("Add a subtitle")
+                .setDescription("Add a description")
+                .setNegativeButtonText("Add a cancel button")
+                .build()
+                .authenticate(LectorTarjeta.this);
     }
 
     //------------------------------------
@@ -147,4 +165,90 @@ public class LectorTarjeta extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onSdkVersionNotSupported() {
+
+    }
+
+    @Override
+    public void onBiometricAuthenticationNotSupported() {
+
+    }
+
+    @Override
+    public void onBiometricAuthenticationNotAvailable() {
+
+    }
+
+    @Override
+    public void onBiometricAuthenticationPermissionNotGranted() {
+
+    }
+
+    @Override
+    public void onBiometricAuthenticationInternalError(String error) {
+
+    }
+
+    @Override
+    public void onAuthenticationFailed() {
+
+    }
+
+    @Override
+    public void onAuthenticationCancelled() {
+
+    }
+
+    @Override
+    public void onAuthenticationSuccessful() {
+        Toast.makeText(this,"aaaaaa",Toast.LENGTH_SHORT).show();
+        System.out.println("TOAST");
+        xd();
+
+    }
+
+    public void xd(){
+
+
+
+        try { //Enviar datos
+            OutputStream outputStream = btSocket.getOutputStream();
+            outputStream.write(0);
+            System.out.println("xd");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try { //Recibir datos
+
+            InputStream inputStream = btSocket.getInputStream();
+            inputStream.skip(inputStream.available()); //INSTANCIA COSAS
+
+            byte c = (byte) inputStream.read();
+            System.out.println("FINNAL AAAAAA"); //IMPRIME
+            System.out.println((char) c); //IMPRIME
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //CERRAR CONEXION
+        try {
+            btSocket.close();
+            System.out.println(btSocket.isConnected());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+
+    }
+
+    @Override
+    public void onAuthenticationError(int errorCode, CharSequence errString) {
+
+    }
 }
