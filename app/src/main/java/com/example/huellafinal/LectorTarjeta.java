@@ -204,43 +204,27 @@ public class LectorTarjeta extends AppCompatActivity implements BiometricCallbac
     public void onAuthenticationSuccessful() {
         Toast.makeText(this,"aaaaaa",Toast.LENGTH_SHORT).show();
         System.out.println("TOAST");
-        xd();
-
-    }
-
-    public void xd(){
-
-
 
         try { //Enviar datos
             OutputStream outputStream = btSocket.getOutputStream();
-            outputStream.write(0);
+            outputStream.write(48);
             System.out.println("xd");
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        try { //Recibir datos
-
-            InputStream inputStream = btSocket.getInputStream();
-            inputStream.skip(inputStream.available()); //INSTANCIA COSAS
-
-            byte c = (byte) inputStream.read();
-            System.out.println("FINNAL AAAAAA"); //IMPRIME
-            System.out.println((char) c); //IMPRIME
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //CERRAR CONEXION
+      /*  //CERRAR CONEXION
         try {
             btSocket.close();
             System.out.println(btSocket.isConnected());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+
     }
+
+
 
     @Override
     public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
